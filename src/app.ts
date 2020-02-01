@@ -1,3 +1,33 @@
+interface validateObject {
+    value: string;
+    required?: boolean;
+    minLength?: number
+    maxLength?: number
+    min?: number
+    max?: number
+}
+
+function validate(inputValidation: validateObject){
+    let isValid = true;
+    if (inputValidation.required) { 
+        isValid = isValid && inputValidation.value.length !== 0
+    }
+    if (inputValidation.maxLength !== undefined && inputValidation.maxLength !== null && typeof inputValidation.value === "string"){
+        isValid = isValid && inputValidation.value.length <= inputValidation.maxLength
+    }
+    if (inputValidation.minLength !== undefined && inputValidation.minLength !== null && typeof inputValidation.value === "string"){
+        isValid = isValid && inputValidation.value.length >= inputValidation.minLength
+    }
+    if (inputValidation.max !== undefined && inputValidation.max !== null && typeof inputValidation.value === "number"){
+        isValid = isValid && inputValidation.value <= inputValidation.max
+    }
+    if (inputValidation.min !== undefined && inputValidation.min !== null && typeof inputValidation.value === "number"){
+        isValid = isValid && inputValidation.value >= inputValidation.min
+    }
+    return isValid;
+}
+
+//Autobind decorator
 function Autobind (_1: any, _2: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
    const adjustedMethod: PropertyDescriptor = {
@@ -11,6 +41,7 @@ function Autobind (_1: any, _2: string, descriptor: PropertyDescriptor) {
    return adjustedMethod;
 }
 
+//Class
 class ProjectInput {
   templteElement: HTMLTemplateElement;
   hostElement: HTMLDivElement;
@@ -54,7 +85,23 @@ class ProjectInput {
       const titleInput = this.titleInputElement.value
       const descInput = this.descriptionInputElement.value
       const peopleInput = this.peopleInputElement.value
-      if (titleInput.length === 0 || descInput.length === 0 || peopleInput.length === 0) {
+      const titleValidation: validateObject = {
+        value: titleInput,
+        required: true
+    }
+    const descValidation: validateObject = {
+        value: descInput,
+        required: true, 
+        minLength: 10,
+        maxLength: 255
+        
+    }
+    const peopleValidation: validateObject = {
+        value: peopleInput,
+        required: true,
+        min: 1
+    }
+      if (validate(titleValidation) && validate(descValidation) && validate(peopleValidation)) {
          throw new Error("Title or desc or people input is wrong")
       } 
       return [titleInput, descInput, +peopleInput]
